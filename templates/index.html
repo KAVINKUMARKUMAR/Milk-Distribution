@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milk Distribution</title>
+    <script>
+        async function calculateDistribution() {
+            let totalLitre = document.getElementById("totalLitre").value;
+            let totalAmount = document.getElementById("totalAmount").value;
+
+            let response = await fetch("/calculate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    total_litre: totalLitre,
+                    total_amount: totalAmount
+                })
+            });
+
+            let result = await response.json();
+            let output = "<h3>Milk Distribution Result</h3>";
+            output += "<table border='1'><tr><th>Member</th><th>Litres</th><th>Fat</th><th>SNF</th><th>Price/Litre</th><th>Amount</th><th>Round Amount</th></tr>";
+
+            result.members.forEach(member => {
+                output += `<tr>
+                    <td>${member.id}</td>
+                    <td>${member.litres.toFixed(2)}</td>
+                    <td>${member.fat.toFixed(1)}</td>
+                    <td>${member.snf.toFixed(1)}</td>
+                    <td>${member.price_per_litre.toFixed(2)}</td>
+                    <td>${member.amount.toFixed(2)}</td>
+                    <td>${member.round_amount.toFixed(2)}</td>
+                </tr>`;
+            });
+
+            output += `<tr><th>Total</th><th>${result.totals.total_litres.toFixed(2)}</th><th></th><th></th><th></th><th>${result.totals.total_amount.toFixed(2)}</th><th>${result.totals.total_round_amount.toFixed(2)}</th></tr>`;
+            output += "</table>";
+
+            document.getElementById("result").innerHTML = output;
+        }
+    </script>
+</head>
+<body>
+    <h2>Milk Distribution System</h2>
+    <label for="totalLitre">Total Litres:</label>
+    <input type="number" id="totalLitre" step="0.01"><br><br>
+
+    <label for="totalAmount">Total Amount:</label>
+    <input type="number" id="totalAmount" step="0.01"><br><br>
+
+    <button onclick="calculateDistribution()">Calculate</button>
+
+    <div id="result"></div>
+</body>
+</html>
